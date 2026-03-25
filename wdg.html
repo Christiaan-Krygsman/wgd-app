@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WGD | Digital Architecture</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="WGD App">
+    <meta name="apple-mobile-web-app-title" content="WGD App">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #00b4d8;
+            --accent: #90e0ef;
+            --danger: #ff4d6d;
+            --dark: #0a0a0a;
+            --deep: #050505;
+            --light: #ffffff;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--dark); 
+            color: var(--light); 
+            font-family: 'Space Grotesk', sans-serif; 
+            line-height: 1.6; 
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 180, 216, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(144, 224, 239, 0.05) 0%, transparent 20%);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 8%; background: rgba(10, 10, 10, 0.8);
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            border-bottom: 1px solid var(--border); backdrop-filter: blur(15px);
+        }
+        .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; letter-spacing: 2px; color: var(--primary); }
+        .nav-right { display: flex; gap: 15px; align-items: center; }
+        
+        .projects-btn {
+            background: transparent; border: 1px solid var(--primary); color: var(--primary);
+            padding: 10px 24px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: var(--transition);
+            text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px;
+        }
+        .projects-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 20px rgba(0, 180, 216, 0.4); }
+        #installBtn { border-color: var(--accent); color: var(--accent); display: none; }
+
+        /* --- UI Elements --- */
+        .brand-header { padding: 160px 10% 40px 10%; text-align: center; }
+        .brand-header h1 {
+            font-family: 'Montserrat', sans-serif; font-size: clamp(4rem, 12vw, 8rem);
+            letter-spacing: -2px; color: var(--light); font-weight: 900;
+            background: linear-gradient(to bottom, #fff 30%, var(--primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .brand-header p { font-size: 0.9rem; letter-spacing: 8px; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-top: 20px; }
+
+        .hero { padding: 60px 10% 80px 10%; text-align: center; }
+        .btn {
+            background: var(--primary); color: white; padding: 18px 40px;
+            border-radius: 50px; border: none; cursor: pointer; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.3);
+        }
+        .btn:hover { transform: translateY(-3px); background: var(--accent); color: var(--dark); }
+        .btn.secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; }
+
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding: 80px 10%; }
+        .card {
+            background: var(--glass); padding: 50px; border-radius: 24px;
+            border: 1px solid var(--border); transition: var(--transition);
+            backdrop-filter: blur(10px); text-align: left;
+        }
+        .card:hover { border-color: var(--primary); background: rgba(255,255,255,0.06); transform: translateY(-10px); }
+        .card i { font-size: 2rem; color: var(--primary); margin-bottom: 25px; display: block; }
+
+        /* --- Modals & Editor --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--deep); padding: 50px; border-radius: 30px; border: 1px solid var(--border); text-align: center; max-width: 500px; width: 90%; }
+        .gui-input { width: 100%; padding: 18px; margin-bottom: 20px; background: #111; border: 1px solid #222; color: white; border-radius: 12px; font-family: inherit; }
+
+        #editorView {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--deep); z-index: 3000; flex-direction: column; padding: 40px;
+        }
+        #editorView.active { display: flex; }
+        #text-file { width: 100%; height: 70vh; background: #080808; color: var(--primary); font-family: 'Courier New', monospace; padding: 30px; border: 1px solid #111; border-radius: 20px; resize: none; font-size: 1.1rem; outline: none; }
+
+        footer { padding: 60px 10%; text-align: center; border-top: 1px solid var(--border); opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">WGD</div>
+        <div class="nav-right">
+            <button id="installBtn" class="projects-btn">Install App</button>
+            <button class="projects-btn" onclick="toggleModal('projectsListModal')">Archive</button>
+        </div>
+    </nav>
+
+    <header class="brand-header">
+        <h1>WGD</h1>
+        <p>Digital Architecture</p>
+    </header>
+
+    <section class="hero">
+        <h2>Engineering high-end digital experiences.</h2>
+        <button class="btn" onclick="toggleModal('createProjectModal')">Start Your Project</button>
+    </section>
+
+    <section class="services-grid">
+        <div class="card">
+            <i class="fas fa-fingerprint"></i>
+            <h3>Identity</h3>
+            <p>Crafting visual systems that define brand legacy.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-terminal"></i>
+            <h3>Architecture</h3>
+            <p>High-performance systems and scalable infrastructure.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-rocket"></i>
+            <h3>Expansion</h3>
+            <p>Driving growth through data-backed creative strategies.</p>
+        </div>
+    </section>
+
+    <div class="modal-overlay" id="createProjectModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 25px; font-family: Montserrat;">Initialize Project</h2>
+            <input type="text" id="projName" class="gui-input" placeholder="Project Title">
+            <textarea id="projDesc" class="gui-input" style="height: 100px;" placeholder="Brief description..."></textarea>
+            <button class="btn" style="width: 100%;" onclick="createProject()">Launch Project</button>
+            <p onclick="toggleModal('createProjectModal')" style="margin-top: 20px; cursor: pointer; font-size: 0.7rem; opacity: 0.5;">DISCARD</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="projectsListModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 25px; font-family: Montserrat;">Project Archive</h2>
+            <div id="listContainer" style="max-height: 350px; overflow-y: auto;"></div>
+            <button class="btn secondary" style="width: 100%; margin-top: 20px;" onclick="toggleModal('projectsListModal')">Close</button>
+        </div>
+    </div>
+
+    <div id="editorView">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div>
+                <h2 id="editTitle" style="font-family: Montserrat;">File</h2>
+                <small style="color: #444; text-transform: uppercase; letter-spacing: 2px;">Offline Storage</small>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn secondary" style="padding: 10px 20px;" onclick="downloadProject()"><i class="fas fa-download"></i> Download .txt</button>
+                <button class="btn" style="padding: 10px 30px;" onclick="saveAndClose()">Save & Exit</button>
+            </div>
+        </div>
+        <textarea id="text-file" spellcheck="false"></textarea>
+    </div>
+
+    <footer><p>&copy; 2026 WGD Digital Agency.</p></footer>
+
+    <script>
+        let projects = JSON.parse(localStorage.getItem('wgd_projects')) || [];
+        let activeIdx = null;
+
+        // --- PWA Installation Logic ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+
+            installBtn.addEventListener('click', () => {
+                installBtn.style.display = 'none';
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        // Register basic Service Worker for PWA compliance
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err));
+            });
+        }
+
+        // --- App Functions ---
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('active');
+            if(id === 'projectsListModal') renderList();
+        }
+
+        function createProject() {
+            const name = document.getElementById('projName').value;
+            if(!name) return alert("Title required.");
+            projects.push({ name: name, content: `// PROJECT: ${name}\n\n` });
+            localStorage.setItem('wgd_projects', JSON.stringify(projects));
+            toggleModal('createProjectModal');
+            openEditor(projects.length - 1);
+        }
+
+        function renderList() {
+            const container = document.getElementById('listContainer');
+            container.innerHTML = projects.length ? '' : '<p style="opacity:0.3; padding: 20px;">No projects found.</p>';
+            projects.forEach((p, i) => {
+                container.innerHTML += `
+                <div style="background:rgba(255,255,255,0.02); padding:20px; margin-bottom:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border);">
+                    <span style="font-weight:700; color:#fff;">${p.name}</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="openEditor(${i})" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:700;">OPEN</button>
+                        <button onclick="deleteProject(${i})" style="color:var(--danger); background:none; border:none; cursor:pointer;"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function deleteProject(index) {
+            if(confirm(`Delete "${projects[index].name}"?`)) {
+                projects.splice(index, 1);
+                localStorage.setItem('wgd_projects', JSON.stringify(projects));
+                renderList();
+            }
+        }
+
+        function openEditor(i) {
+            activeIdx = i;
+            document.getElementById('editTitle').innerText = projects[i].name;
+            document.getElementById('text-file').value = projects[i].content;
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            document.getElementById('editorView').classList.add('active');
+        }
+
+        function downloadProject() {
+            const content = document.getElementById('text-file').value;
+            const filename = `${projects[activeIdx].name}.txt`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const elem = window.document.createElement('a');
+            elem.href = window.URL.createObjectURL(blob);
+            elem.download = filename;        
+            document.body.appendChild(elem);
+            elem.click();        
+            document.body.removeChild(elem);
+        }
+
+        function saveAndClose() {
+            if(activeIdx !== null) {
+                projects[activeIdx].content = document.getElementById('text-file').value;
+                localStorage.setItem('wgd_projects', JSON.stringify(projects));
+            }
+            document.getElementById('editorView').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
